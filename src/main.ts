@@ -108,12 +108,12 @@ export function main(command?: string): void {
     HPQuest,
     MoxieQuest,
     MuscleQuest,
+    WeaponDamageQuest,
+    SpellDamageQuest,
     swapFamAndNCTests ? NoncombatQuest : FamiliarWeightQuest,
     swapFamAndNCTests ? FamiliarWeightQuest : NoncombatQuest,
     BoozeDropQuest,
     HotResQuest,
-    WeaponDamageQuest,
-    SpellDamageQuest,
     DonateQuest,
   ];
   const tasks: Task[] = getTasks(questList);
