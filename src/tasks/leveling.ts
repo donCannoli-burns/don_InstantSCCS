@@ -1534,35 +1534,18 @@ export const LevelingQuest: Quest = {
       completed: () =>
         CombatLoversLocket.monstersReminisced().includes($monster`red skeleton`) ||
         !CombatLoversLocket.availableLocketMonsters().includes($monster`red skeleton`) ||
-        get("instant_saveLocketRedSkeleton", false),
+        get("instant_saveLocketRedSkeleton", 
+false) ||
+        get("_saberForceUses") >= 5,
       do: () => CombatLoversLocket.reminisce($monster`red skeleton`),
-      combat: new CombatStrategy().macro(() =>
-        Macro.if_(
-          "!haseffect Everything Looks Yellow",
-          Macro.externalIf(useParkaSpit, Macro.trySkill($skill`Spit jurassic acid`))
-            .trySkill($skill`Blow the Yellow Candle!`)
-            .tryItem($item`yellow rocket`),
-        )
-          .externalIf(
-            have($item`April Shower Thoughts shield`),
-            Macro.trySkill($skill`Northern Explosion`),
-          )
-          .trySkill($skill`Feel Envy`)
-          .default(),
-      ),
+      combat: new 
+      CombatStrategy().macro(Macro.trySkill($skill`Use the Force`).default()),
       outfit: () => ({
-        ...baseOutfit(false),
-        hat: daylightShavingsHelmet(),
-        offhand: reduceItemUndefinedArray([
-          romanCandelabra($effect`Everything Looks Yellow`),
-          have($item`April Shower Thoughts shield`) && have($skill`Northern Explosion`)
-            ? $item`April Shower Thoughts shield`
-            : undefined,
-          $item`unbreakable umbrella`,
-        ]),
-        modifier: `0.25 ${mainStatMaximizerStr}, 0.33 ML`,
-        modes: { parka: "dilophosaur" },
+        weapon: $item`Fourth of May Cosplay Saber`,
+        familiar: chooseFamiliar(false),
+        avoid: sugarItemsAboutToBreak(),
       }),
+      choices: { 1387: 3 },
       post: (): void => {
         use($item`red box`, 1);
         sendAutumnaton();
