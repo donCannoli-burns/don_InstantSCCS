@@ -1,4 +1,5 @@
-import { Familiar } from "kolmafia";
+
+import { Familiar, itemAmount } from "kolmafia";
 import { $familiar, $familiars, $item, get, have } from "libram";
 import { camelFightsLeft, haveAndNotExcluded, haveCBBIngredients } from "./lib";
 
@@ -12,8 +13,10 @@ export function cookbookbat(): Familiar {
   return !haveCBBIngredients(true) ? $familiar`Cookbookbat` : $familiar.none;
 }
 
-function shorterOrderCook(allowAttackingFamiliars = true): Familiar {
-  return allowAttackingFamiliars && !have($item`short stack of pancakes`)
+  return allowAttackingFamiliars &&
+    !have($item`short stack of pancakes`) &&
+    get("_shortOrderCookCharge") - 
+    itemAmount($item`battle broom`) <= 10
     ? $familiar`Shorter-Order Cook`
     : $familiar.none;
 }
