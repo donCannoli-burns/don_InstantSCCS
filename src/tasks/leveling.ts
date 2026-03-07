@@ -140,6 +140,7 @@ import {
   tryAcquiringEffects,
   tryAcquiringOdeToBooze,
   useCenser,
+  useCinch,
   useParkaSpit,
   wishFor,
   xpWishEffect,
@@ -155,7 +156,6 @@ import {
   romanCandelabra,
 } from "../outfit";
 
-const useCinch = !get("instant_saveCinch", false);
 const baseBoozes = $items`bottle of rum, boxed wine, bottle of gin, bottle of vodka, bottle of tequila, bottle of whiskey`;
 const seaFruits = $items`sea tangelo, sea persimmon, sea lychee, sea honeydew, sea blueberry`;
 const fishDrops = $items`beefy fish meat, glistening fish meat, slick fish meat, dull fish scale, rough fish scale, pristine fish scale`;
@@ -1018,7 +1018,7 @@ export const LevelingQuest: Quest = {
             // eslint-disable-next-line libram/verify-constants
             Macro.trySkill($skill`Club 'Em Into Next Week`).abort(),
           )
-          .if_(`monstername ${get("clubEmNextWeekMonster")}`, Macro.default())
+          .if_(`monstername ${get("clubEmNextWeekMonster")}`, Macro.default(useCinch))
           .abort(),
       ),
       outfit: () => ({
@@ -1164,7 +1164,7 @@ export const LevelingQuest: Quest = {
           .trySkill($skill`Curse of Weaksauce`)
           .tryItem($item`blue rocket`)
           .tryItem($item`red rocket`)
-          .default(),
+          .default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(false),
@@ -1277,7 +1277,7 @@ export const LevelingQuest: Quest = {
       combat: new CombatStrategy().macro(
         Macro.tryItem($item`red rocket`)
           .trySkill($skill`Recall Facts: %phylum Circadian Rhythms`)
-          .default(),
+          .default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(),
@@ -1342,7 +1342,7 @@ export const LevelingQuest: Quest = {
       combat: new CombatStrategy().macro(
         Macro.trySkill($skill`%fn, Release the Patriotic Screech!`)
           .trySkill($skill`Recall Facts: %phylum Circadian Rhythms`)
-          .default(),
+          .default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(),
@@ -1399,7 +1399,7 @@ export const LevelingQuest: Quest = {
         !have($item`miniature crystal ball`),
       do: () => crystalBallFreeFightLocation(),
       limit: { tries: 10 },
-      combat: new CombatStrategy().macro(Macro.default()),
+      combat: new CombatStrategy().macro(Macro.default(useCinch)),
       outfit: () => ({
         ...baseOutfit(),
         famequip: $item`miniature crystal ball`,
@@ -1448,8 +1448,11 @@ export const LevelingQuest: Quest = {
           Macro.trySkill($skill`Recall Facts: Monster Habitats`),
         )
           .trySkill($skill`Blow the Purple Candle!`)
-          // eslint-disable-next-line libram/verify-constants
-          .trySkill($skill`Club 'Em Into Next Week`)
+          .externalIf(
+            get("_clubEmNextWeekUsed", 0) < 5 - get("instant_saveClubEmNextWeek", 0),
+            // eslint-disable-next-line libram/verify-constants
+            Macro.trySkill($skill`Club 'Em Into Next Week`),
+          )
           .default(useCinch),
       ),
       outfit: () => ({
@@ -1482,16 +1485,10 @@ export const LevelingQuest: Quest = {
         visitUrl("campground.php?preaction=leaves");
         visitUrl("choice.php?pwd&whichchoice=1510&option=1&leaves=11");
       },
-      combat: new CombatStrategy().macro(
-        Macro.trySkill($skill`Otoscope`)
-          // eslint-disable-next-line libram/verify-constants
-          .trySkill($skill`Club 'Em Into Next Week`)
-          .default(),
-      ),
+      combat: new CombatStrategy().macro(Macro.trySkill($skill`Otoscope`).default(useCinch)),
       outfit: () => ({
         ...baseOutfit(),
         hat: daylightShavingsHelmet(),
-        weapon: legendarySealClubbingClub("NextWeek"),
         offhand: $item`unbreakable umbrella`,
         acc3:
           have($item`Lil' Doctor™ bag`) && get("_otoscopeUsed") < 3
@@ -1763,8 +1760,11 @@ false) ||
               Array.from(getBanishedMonsters().values()).includes($monster`fluffy bunny`)),
           Macro.trySkill($skill`Recall Facts: Monster Habitats`),
         )
-          // eslint-disable-next-line libram/verify-constants
-          .trySkill($skill`Club 'Em Into Next Week`)
+          .externalIf(
+            get("_clubEmNextWeekUsed", 0) < 5 - get("instant_saveClubEmNextWeek", 0),
+            // eslint-disable-next-line libram/verify-constants
+            Macro.trySkill($skill`Club 'Em Into Next Week`),
+          )
           .default(useCinch),
       ),
       post: (): void => {
@@ -1785,7 +1785,7 @@ false) ||
       combat: new CombatStrategy().macro(
         Macro.trySkill($skill`Feel Envy`)
           .trySkill($skill`Portscan`)
-          .default(),
+          .default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(),
@@ -1815,7 +1815,7 @@ false) ||
       combat: new CombatStrategy().macro(
         Macro.trySkill($skill`Feel Envy`)
           .trySkill($skill`Portscan`)
-          .default(),
+          .default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(),
@@ -1841,7 +1841,7 @@ false) ||
         !SourceTerminal.have() ||
         get("_sourceTerminalPortscanUses") > 0,
       do: $location`An Unusually Quiet Barroom Brawl`,
-      combat: new CombatStrategy().macro(Macro.trySkill($skill`Portscan`).default()),
+      combat: new CombatStrategy().macro(Macro.trySkill($skill`Portscan`).default(useCinch)),
       outfit: () => ({
         ...baseOutfit(),
         offhand: $item`unbreakable umbrella`,
@@ -1861,7 +1861,7 @@ false) ||
       },
       completed: () => get("_speakeasyFreeFights") >= 3 || !get("ownsSpeakeasy"),
       do: $location`An Unusually Quiet Barroom Brawl`,
-      combat: new CombatStrategy().macro(Macro.default()),
+      combat: new CombatStrategy().macro(Macro.default(useCinch)),
       outfit: () => ({
         ...baseOutfit(),
         offhand: $item`unbreakable umbrella`,
@@ -1943,8 +1943,11 @@ false) ||
           Macro.trySkill($skill`Recall Facts: Monster Habitats`),
         )
           .trySkill($skill`Blow the Purple Candle!`)
-          // eslint-disable-next-line libram/verify-constants
-          .trySkill($skill`Club 'Em Into Next Week`)
+          .externalIf(
+            get("_clubEmNextWeekUsed", 0) < 5 - get("instant_saveClubEmNextWeek", 0),
+            // eslint-disable-next-line libram/verify-constants
+            Macro.trySkill($skill`Club 'Em Into Next Week`),
+          )
           .default(useCinch),
       ),
       outfit: () => ({

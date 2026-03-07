@@ -22,6 +22,7 @@ import {
   min,
   myFamiliar,
   myInebriety,
+  myLocation,
   myMaxhp,
   myMaxmp,
   myMeat,
@@ -105,6 +106,7 @@ import {
   sendAutumnaton,
   tryAcquiringOdeToBooze,
   useCenser,
+  useCinch,
   useParkaSpit,
 } from "../lib";
 import {
@@ -926,6 +928,21 @@ export const RunStartQuest: Quest = {
       limit: { tries: 1 },
     },
     {
+      name: "Archaeologist's Spade Skeletons",
+      ready: () => myLocation() === $location`The Skeleton Store`,
+      completed: () =>
+        // eslint-disable-next-line libram/verify-constants
+        !have($item`Archaeologist's Spade`) ||
+        get("_archSpadeDigs", 0) >= 11 - get("instant_saveSpadeDigs", 0),
+      do: () => {
+        visitUrl(`inv_use.php?which=3&whichitem=12184&pwd`);
+        runChoice(3);
+      },
+      combat: new CombatStrategy().macro(Macro.default()),
+      outfit: () => baseOutfit(),
+      limit: { tries: 11 },
+    },
+    {
       name: "Peridot Novelty Tropical Skeleton",
       prepare: (): void => {
         if (useParkaSpit) {
@@ -1160,9 +1177,12 @@ export const RunStartQuest: Quest = {
       },
       combat: new CombatStrategy().macro(
         Macro.trySkill($skill`Blow the Purple Candle!`)
-          // eslint-disable-next-line libram/verify-constants
-          .trySkill($skill`Club 'Em Into Next Week`)
-          .default(),
+          .externalIf(
+            get("_clubEmNextWeekUsed", 0) < 5 - get("instant_saveClubEmNextWeek", 0),
+            // eslint-disable-next-line libram/verify-constants
+            Macro.trySkill($skill`Club 'Em Into Next Week`),
+          )
+          .default(useCinch),
       ),
     },
     {
@@ -1213,7 +1233,7 @@ export const RunStartQuest: Quest = {
         sendAutumnaton();
       },
       combat: new CombatStrategy().macro(
-        Macro.trySkill($skill`Blow the Purple Candle!`).default(!get("instant_saveCinch", false)),
+        Macro.trySkill($skill`Blow the Purple Candle!`).default(useCinch),
       ),
       outfit: () => ({
         ...baseOutfit(),
